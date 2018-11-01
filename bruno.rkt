@@ -8,7 +8,8 @@
 ;(struct failure (estado) #:transparent)
 
 (define test-graph (graph-struct (list (edge (node "A") (node "B") "a") (edge (node "A") (node "A") "c")
-                                       (edge (node "C") (node "B") "c") (edge (node "B") (node "C") "c"))))
+                                       (edge (node "C") (node "B") "c") (edge (node "B") (node "C") "c")
+                                       (edge (node "C") (node "A") "b"))))
 
 ;(define grafo '((A B a)(A A b) (B A a)(B B a) (A C a)(A C b))) ;Origem Destino Aresta
 ;(define prog  '("A" (a : a U a : b)))
@@ -36,6 +37,27 @@
       #t
       (and (member (car l1) l2) (sublist (cdr l1) l2))))
 
+(define (graph-walker world pdl graph)
+  (match pdl
+    [(? atomic? a)
+     (let ([new (next-world world pdl graph)])
+           new)]
+    [(non-deterministic-choice a b)
+     (let ([new-a (graph-walker world a graph)]
+           [new-b (graph-walker world b graph)])
+                   (append new-a new-b))]
+           
+    [(seq a b)
+     (let ([new-a (graph-walker world a graph)]
+           [new-f (lambda (world) (graph-walker world b graph))])
+       (append new-a (apply append (map new-f new-a))))]
+    [(repetition a) (let rep ([l (list world)]
+                              [world world])
+                      (let ([new-worlds (graph-walker world a graph)])
+                        (if (sublist new-worlds l)
+                            l
+(apply append (map (lambda (w) (rep (cons w (append new-worlds l)) w)) new-worlds)))))]))
+
 (define (next-world* world pdl graph)
   (match pdl
     [(? atomic? a)
@@ -49,14 +71,13 @@
     [(seq a b)
      (let ([new-a (next-world* world a graph)]
            [new-f (lambda (world) (next-world* world b graph))])
-       (append new-a (apply append (map new-f new-a))))]
+       (apply append (map new-f new-a)))]
     [(repetition a) (let rep ([l (list world)]
                               [world world])
                       (let ([new-worlds (next-world* world a graph)])
                         (if (sublist new-worlds l)
                             l
                             (apply append (map (lambda (w) (rep (cons w (append new-worlds l)) w)) new-worlds)))))]))
-
 (define program (seq
                  (atomic "a")
                  (seq
@@ -64,8 +85,14 @@
                   (atomic "b"))))
 
 
-(define (evaluate pdl graph world)
-  (sublist (graph-vertices graph) (remove-duplicates (cons world (next-world* world pdl graph)))))
+(define (evaluate pdl world [graph test-graph])
+  (let ([l (cons world (graph-walker world pdl graph))])
+    (if
+     (and
+      (sublist (graph-vertices graph) (remove-duplicates l))
+      (not(null?(next-world* world pdl graph))))
+     #t
+     (last l))))
 
 
 
