@@ -5,11 +5,12 @@
 (struct graph-struct (l) #:transparent)
 (struct node (name) #:transparent)
 (struct edge (origin destination label) #:transparent)
-(struct failure (estado) #:transparent)
+;(struct failure (estado) #:transparent)
 
 (define test-graph (graph-struct (list (edge (node "A") (node "B") "a") (edge (node "A") (node "A") "b")
                                        (edge (node "B") (node "A") "a") (edge (node "B") (node "B") "a")
-                                       (edge (node "A") (node "C") "a") (edge (node "A") (node "C") "b"))))
+                                       (edge (node "A") (node "C") "a") (edge (node "A") (node "C") "b")
+                                       (edge (node "B") (node "C") "b") (edge (node "C") (node "D") "c"))))
 
 ;(define grafo '((A B a)(A A b) (B A a)(B B a) (A C a)(A C b))) ;Origem Destino Aresta
 ;(define prog  '("A" (a : a U a : b)))
@@ -28,7 +29,9 @@
                 (next-world world atomic (graph-struct (cdr (graph-struct-l graph))) (cons destination lst))
                 (next-world world atomic (graph-struct (cdr (graph-struct-l graph))) lst)))))
 
-
+(define (graph-vertices g)
+  (match g
+    [(graph-struct l) (remove-duplicates (apply append (map (lambda (e) (list (node-name (edge-origin e)) (node-name (edge-destination e)))) l)))]))
 
 (define (sublist l1 l2)
   (if (null? l1)
@@ -64,7 +67,7 @@
 
 
 (define (evaluate pdl graph world)
-  (not (null? (next-world* world pdl graph))))
+  (sublist (graph-vertices graph) (remove-duplicates (next-world* world pdl graph))))
 
 
 
