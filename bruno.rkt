@@ -7,10 +7,8 @@
 (struct edge (origin destination label) #:transparent)
 ;(struct failure (estado) #:transparent)
 
-(define test-graph (graph-struct (list (edge (node "A") (node "B") "a") (edge (node "A") (node "A") "b")
-                                       (edge (node "B") (node "A") "a") (edge (node "B") (node "B") "a")
-                                       (edge (node "A") (node "C") "a") (edge (node "A") (node "C") "b")
-                                       (edge (node "B") (node "C") "b") (edge (node "C") (node "D") "c"))))
+(define test-graph (graph-struct (list (edge (node "A") (node "B") "a") (edge (node "A") (node "A") "c")
+                                       (edge (node "C") (node "B") "c") (edge (node "B") (node "C") "c"))))
 
 ;(define grafo '((A B a)(A A b) (B A a)(B B a) (A C a)(A C b))) ;Origem Destino Aresta
 ;(define prog  '("A" (a : a U a : b)))
@@ -51,7 +49,7 @@
     [(seq a b)
      (let ([new-a (next-world* world a graph)]
            [new-f (lambda (world) (next-world* world b graph))])
-       (apply append (map new-f new-a)))]
+       (append new-a (apply append (map new-f new-a))))]
     [(repetition a) (let rep ([l (list world)]
                               [world world])
                       (let ([new-worlds (next-world* world a graph)])
@@ -67,7 +65,7 @@
 
 
 (define (evaluate pdl graph world)
-  (sublist (graph-vertices graph) (remove-duplicates (next-world* world pdl graph))))
+  (sublist (graph-vertices graph) (remove-duplicates (cons world (next-world* world pdl graph)))))
 
 
 
