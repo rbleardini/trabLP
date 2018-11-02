@@ -1,0 +1,21 @@
+Primeiro teste:
+(evaluate (parser "a") "A")
+
+resultado: O programa retornará "B", pois vai fazer uma transição de "A" para "B", mas como não passou por todos os nós o resultado deve ser o último nó por onde passou.
+
+Segundo teste:
+(evaluate (parser "a;c") "A")
+
+resultado: O programa retornará "#t"(true). O programa tem uma execução que passa por todos os nós do gráfo e não tenta fazer uma transição inválida
+
+Terceiro teste:
+(evaluate (parser "aUa;c") "A")
+
+resultado: O programa retornará "#t". Como a escolha não deterministica (U) encontra um caminho válido que passa por todos os nós.
+
+Quarto teste: 
+(evaluate (parser "z*") "A") 
+
+resultado: O programa retornará "A". Pois, apesar de 0 ser uma quantidade válidade de vezes para fazer aquela transição, ele não passa por todos os vértices.
+
+
