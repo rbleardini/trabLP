@@ -16,7 +16,7 @@ abra o drracket. Abra a main.rkt no drracket(menu file, opcao open)
 
 aperte o botao run, no canto superior direito do drracket.
 
-execute o comando (evaluate (parser "prog pdl desejado sem espacos ou parentesis) "NoInicial")
+execute o comando (evaluate (parser "prog pdl desejado sem espacos ou parentesis") "NoInicial")
 ex:(evaluate (parser "a;b") "A")
 
 para alterar o grafo altere a variavel test-graph para 
