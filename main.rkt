@@ -5,14 +5,11 @@
 (struct graph-struct (l) #:transparent)
 (struct node (name) #:transparent)
 (struct edge (origin destination label) #:transparent)
-;(struct failure (estado) #:transparent)
+
 
 (define test-graph (graph-struct (list (edge (node "A") (node "B") "a") (edge (node "A") (node "A") "c")
                                        (edge (node "C") (node "B") "c") (edge (node "B") (node "C") "c")
                                        (edge (node "C") (node "A") "b"))))
-
-;(define grafo '((A B a)(A A b) (B A a)(B B a) (A C a)(A C b))) ;Origem Destino Aresta
-;(define prog  '("A" (a : a U a : b)))
 
 (define (next-world world atomic graph [lst '()])
       (if (null? (graph-struct-l graph))
@@ -78,11 +75,6 @@
                         (if (sublist new-worlds l)
                             l
                             (apply append (map (lambda (w) (rep (cons w (append new-worlds l)) w)) new-worlds)))))]))
-(define program (seq
-                 (atomic "a")
-                 (seq
-                  (non-deterministic-choice (atomic "a") (atomic "a"))
-                  (atomic "b"))))
 
 
 (define (evaluate pdl world [graph test-graph])
@@ -93,24 +85,4 @@
       (not(null?(next-world* world pdl graph))))
      #t
      (last l))))
-
-
-
-
-   
-;;(-> pdl graph world (list) bool)
-#|(define (evaluate-front pdl graph world)
-  (null? (evaluate pdl graph world)))
-|#
-;;(-> pdl graph world (list) (list worlds))
-#|
-(define (evaluate pdl graph world [visited '()])
-  (match pdl
-    [(? atomic? a) (]
-    [(non-deterministic-choice a b) (and
-                                     (evaluate a graph world visited)
-                                     (evalueate b graph world visited))]
-    [(seq a b) (]
-|#
-
 
