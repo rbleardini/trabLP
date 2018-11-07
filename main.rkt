@@ -87,11 +87,21 @@
                    [(arestas) (map cadr worlds-and-arestas)])
        (values (append new-a (apply append worlds)) (append new-arestas-a (apply append arestas))))]
     [(repetition a) (let rep ([l (list world)]
+                              [k (list)]
                               [world world])
-                      (let ([new-worlds (graph-walker world a graph)])
-                        (if (sublist new-worlds l)
-                            l
-                            (apply append (map (lambda (w) (rep (cons w (append new-worlds l)) w)) new-worlds)))))]))
+                      (let-values ([(new-worlds arestas) (graph-walker world a graph)])
+                        (if (and
+                             (sublist new-worlds l)
+                             (sublist arestas k))
+                            (values l k)
+                            (let* ([worlds-and-arestas (map
+                              (lambda (w)
+                                (let-values ([(a b) (rep
+                                 (cons w (append new-worlds l)) (append arestas k) w)]) (list a b)))
+                              new-worlds)]
+                                  [worlds (map car worlds-and-arestas)]
+                                  [arestas (map cadr worlds-and-arestas)])
+                            (values (apply append worlds) (apply append arestas))))))]))
 
 (define (next-world* world pdl graph)
   (match pdl
